@@ -45,6 +45,18 @@ pipeline {
             }
         }
 
+        stage('Unit Tests') {
+        steps {
+            sh '''
+                echo "========== UNIT TESTS =========="
+
+                mvn -B \
+                    -Denforcer.skip=true \
+                    test
+            '''
+        }
+    }
+
         stage('Docker Login to Public ECR') {
             steps {
                 sh '''
