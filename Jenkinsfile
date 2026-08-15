@@ -11,14 +11,24 @@ pipeline {
         IMAGE_TAG      = "${BUILD_NUMBER}"
         IMAGE_URI      = "public.ecr.aws/q2s1m9s9/jenkinsecr:${BUILD_NUMBER}"
 
-        EKS_REGION     = 'ap-south-1'
-        EKS_CLUSTER    = 'my-eks-cluster'
 
         K8S_NAMESPACE  = 'java-app'
         K8S_DEPLOYMENT = 'java-app'
         K8S_CONTAINER  = 'java-app'
     }
+stage('Verify Kubernetes Access') {
+    steps {
+        sh '''
+            echo "========== KUBERNETES ACCESS =========="
 
+            export KUBECONFIG=/var/lib/jenkins/.kube/config
+
+            kubectl get deployment \
+                ${K8S_DEPLOYMENT} \
+                -n ${K8S_NAMESPACE}
+        '''
+    }
+}
     stages {
 
         stage('Checkout') {
@@ -84,26 +94,19 @@ pipeline {
             }
         }
 
-        stage('Configure Kubernetes') {
-            steps {
-                sh '''
-                    echo "========== KUBERNETES CONFIG =========="
+        stage('Verify Kubernetes Access') {
+    steps {
+        sh '''
+            echo "========== KUBERNETES ACCESS =========="
 
-                    aws eks update-kubeconfig \
-                        --region ${EKS_REGION} \
-                        --name ${EKS_CLUSTER} \
-                        --kubeconfig /var/lib/jenkins/.kube/config
+            export KUBECONFIG=/var/lib/jenkins/.kube/config
 
-                    chmod 600 /var/lib/jenkins/.kube/config
-
-                    export KUBECONFIG=/var/lib/jenkins/.kube/config
-
-                    kubectl get deployment \
-                        ${K8S_DEPLOYMENT} \
-                        -n ${K8S_NAMESPACE}
-                '''
-            }
-        }
+            kubectl get deployment \
+                ${K8S_DEPLOYMENT} \
+                -n ${K8S_NAMESPACE}
+        '''
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {
