@@ -96,7 +96,7 @@
 
     <span class="badge">APPLICATION RUNNING</span>
 
-    <h1>Java DevOps Application V2</h1>
+    <h1>Java DevOps Application V3</h1>
 
     <p class="subtitle">
         Continuous Integration and Continuous Deployment demonstration
