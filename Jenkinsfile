@@ -11,24 +11,11 @@ pipeline {
         IMAGE_TAG      = "${BUILD_NUMBER}"
         IMAGE_URI      = "public.ecr.aws/q2s1m9s9/jenkinsecr:${BUILD_NUMBER}"
 
-
         K8S_NAMESPACE  = 'java-app'
         K8S_DEPLOYMENT = 'java-app'
         K8S_CONTAINER  = 'java-app'
     }
-stage('Verify Kubernetes Access') {
-    steps {
-        sh '''
-            echo "========== KUBERNETES ACCESS =========="
 
-            export KUBECONFIG=/var/lib/jenkins/.kube/config
-
-            kubectl get deployment \
-                ${K8S_DEPLOYMENT} \
-                -n ${K8S_NAMESPACE}
-        '''
-    }
-}
     stages {
 
         stage('Checkout') {
