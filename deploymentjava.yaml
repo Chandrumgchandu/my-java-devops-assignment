@@ -1,21 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: java-app
   labels:
     app: java-app
+
 spec:
   replicas: 2
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+
   selector:
     matchLabels:
       app: java-app
+
   template:
     metadata:
       labels:
         app: java-app
+
     spec:
       containers:
         - name: java-app
-          image: public.ecr.aws/k0c8q8z5/jenkinsecr:latest
+
+          image: public.ecr.aws/q2s1m9s9/jenkinsecr:latest
+
+          imagePullPolicy: Always
+
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          readinessProbe:
+            httpGet:
+              path: /helloworld/
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /helloworld/
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
