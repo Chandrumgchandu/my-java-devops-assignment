@@ -64,7 +64,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>DevOps Calculator v1</title>
+    <title>DevOps Calculator v2</title>
 
     <style>
 
