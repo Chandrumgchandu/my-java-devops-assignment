@@ -752,7 +752,7 @@
             <div>
 
                 <h1>
-                    DevOps Calculator v2
+                    DevOps Calculator v1
                 </h1>
 
                 <p>
