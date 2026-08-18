@@ -3,7 +3,7 @@ pipeline {
     triggers {
         githubPush()
     }
-    
+
     agent any
 
     environment {
@@ -38,6 +38,18 @@ pipeline {
             }
         }
 
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                    echo "========== UNIT TESTS =========="
+
+                    mvn -B \
+                        -Denforcer.skip=true \
+                        test
+                '''
+            }
+        }
+
         stage('Build Java Application') {
             steps {
                 sh '''
@@ -49,18 +61,6 @@ pipeline {
                 '''
             }
         }
-
-        stage('Unit Tests') {
-        steps {
-            sh '''
-                echo "========== UNIT TESTS =========="
-
-                mvn -B \
-                    -Denforcer.skip=true \
-                    test
-            '''
-        }
-    }
 
         stage('Docker Login to Public ECR') {
             steps {
@@ -99,18 +99,18 @@ pipeline {
         }
 
         stage('Verify Kubernetes Access') {
-    steps {
-        sh '''
-            echo "========== KUBERNETES ACCESS =========="
+            steps {
+                sh '''
+                    echo "========== KUBERNETES ACCESS =========="
 
-            export KUBECONFIG=/var/lib/jenkins/.kube/config
+                    export KUBECONFIG=/var/lib/jenkins/.kube/config
 
-            kubectl get deployment \
-                ${K8S_DEPLOYMENT} \
-                -n ${K8S_NAMESPACE}
-        '''
-    }
-}
+                    kubectl get deployment \
+                        ${K8S_DEPLOYMENT} \
+                        -n ${K8S_NAMESPACE}
+                '''
+            }
+        }
 
         stage('Deploy to Kubernetes') {
             steps {
