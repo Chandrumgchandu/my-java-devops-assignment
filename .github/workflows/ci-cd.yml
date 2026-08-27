@@ -5,6 +5,13 @@ on:
     branches:
       - main
 
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: public.ecr.aws
+  ECR_REPOSITORY: q2s1m9s9/jenkinsecr
+  IMAGE_TAG: ${{ github.run_number }}
+  IMAGE_URI: public.ecr.aws/q2s1m9s9/jenkinsecr:${{ github.run_number }}
+
 jobs:
   build:
     runs-on: self-hosted
@@ -22,3 +29,24 @@ jobs:
         run: |
           echo "========== MAVEN BUILD =========="
           mvn clean -B -Denforcer.skip=true package
+
+      - name: Login to AWS Public ECR
+        run: |
+          echo "========== ECR LOGIN =========="
+          aws ecr-public get-login-password \
+            --region $AWS_REGION |
+          docker login \
+            --username AWS \
+            --password-stdin $ECR_REGISTRY
+
+      - name: Build Docker image
+        run: |
+          echo "========== DOCKER BUILD =========="
+          docker build \
+            -t $IMAGE_URI \
+            .
+
+      - name: Push Docker image
+        run: |
+          echo "========== DOCKER PUSH =========="
+          docker push $IMAGE_URI
