@@ -1,0 +1,17 @@
+name: Java CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-runner:
+    runs-on: self-hosted
+
+    steps:
+      - name: Test runner
+        run: |
+          echo "GitHub Actions runner is working"
+          hostname
+          whoami
