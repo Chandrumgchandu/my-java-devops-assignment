@@ -12,6 +12,10 @@ env:
   IMAGE_TAG: ${{ github.run_number }}
   IMAGE_URI: public.ecr.aws/q2s1m9s9/jenkinsecr:${{ github.run_number }}
 
+  K8S_NAMESPACE: java-app
+  K8S_DEPLOYMENT: java-app
+  K8S_CONTAINER: java-app
+
 jobs:
   build:
     runs-on: self-hosted
@@ -50,3 +54,39 @@ jobs:
         run: |
           echo "========== DOCKER PUSH =========="
           docker push $IMAGE_URI
+
+      - name: Verify Kubernetes access
+        run: |
+          echo "========== KUBERNETES ACCESS =========="
+          kubectl get deployment \
+            $K8S_DEPLOYMENT \
+            -n $K8S_NAMESPACE
+
+      - name: Deploy to Kubernetes
+        run: |
+          echo "========== KUBERNETES DEPLOYMENT =========="
+
+          kubectl set image deployment/$K8S_DEPLOYMENT \
+            $K8S_CONTAINER=$IMAGE_URI \
+            -n $K8S_NAMESPACE
+
+          kubectl rollout status \
+            deployment/$K8S_DEPLOYMENT \
+            -n $K8S_NAMESPACE
+
+      - name: Verify deployment
+        run: |
+          echo "========== DEPLOYMENT VERIFICATION =========="
+
+          kubectl get deployment \
+            $K8S_DEPLOYMENT \
+            -n $K8S_NAMESPACE
+
+          echo
+          kubectl get pods \
+            -n $K8S_NAMESPACE \
+            -o wide
+
+          echo
+          kubectl get service \
+            -n $K8S_NAMESPACE
