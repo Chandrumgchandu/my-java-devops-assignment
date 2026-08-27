@@ -6,12 +6,19 @@ on:
       - main
 
 jobs:
-  test-runner:
+  build:
     runs-on: self-hosted
 
     steps:
-      - name: Test runner
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Run unit tests
         run: |
-          echo "GitHub Actions runner is working"
-          hostname
-          whoami
+          echo "========== UNIT TESTS =========="
+          mvn -B -Denforcer.skip=true test
+
+      - name: Build Java application
+        run: |
+          echo "========== MAVEN BUILD =========="
+          mvn clean -B -Denforcer.skip=true package
